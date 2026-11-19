@@ -114,6 +114,7 @@ model Appointment {
   stripeSessionId       String?           @unique
   stripePaymentIntentId String?
   notes                 String?
+  reminderSentAt        DateTime?
   createdAt             DateTime          @default(now())
 
   @@index([doctorId, startsAt])

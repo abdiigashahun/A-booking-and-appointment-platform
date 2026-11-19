@@ -66,7 +66,9 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 Copy the printed `whsec_...` signing secret into `STRIPE_WEBHOOK_SECRET` in
 `.env.local`. Set `CRON_SECRET` to a separate random value for the appointment
-cleanup route.
+cleanup and reminder routes. Configure `RESEND_API_KEY` and a verified
+`EMAIL_FROM` address to deliver transactional email. Without a Resend key,
+emails are logged to the server console.
 
 ## Conventions
 
