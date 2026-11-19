@@ -1,0 +1,13 @@
+"use client";
+import * as React from "react";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+const Form = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => <div ref={ref} className={cn("space-y-2", className)} {...props} />);
+FormItem.displayName = "FormItem";
+const FormLabel = React.forwardRef<React.ElementRef<typeof Label>, React.ComponentPropsWithoutRef<typeof Label>>(({ className, ...props }, ref) => <Label ref={ref} className={cn(className)} {...props} />);
+FormLabel.displayName = "FormLabel";
+const FormControl = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+const FormDescription = ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => <p className={cn("text-sm text-muted-foreground", className)} {...props} />;
+const FormMessage = ({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => <p className={cn("text-sm font-medium text-destructive", className)} {...props}>{children}</p>;
+export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage };
