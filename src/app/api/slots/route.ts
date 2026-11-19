@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAvailableSlots } from "@/lib/slots";
+import { db } from "@/lib/db";
 
 const querySchema = z.object({
   doctorId: z.string().min(1).max(200),
@@ -15,6 +16,18 @@ export async function GET(request: Request) {
   }
 
   try {
+    if (parsed.data.doctorId === "any") {
+      const doctors = await db.doctor.findMany({
+        where: { isActive: true, services: { some: { serviceId: parsed.data.serviceId } } },
+        select: { id: true },
+      });
+      const results = await Promise.all(doctors.map(async (doctor) => ({
+        doctorId: doctor.id,
+        slots: await getAvailableSlots({ ...parsed.data, doctorId: doctor.id }),
+      })));
+      const slots = [...new Set(results.flatMap((result) => result.slots))].sort();
+      return NextResponse.json({ slots });
+    }
     const slots = await getAvailableSlots(parsed.data);
     return NextResponse.json({ slots });
   } catch (error) {
