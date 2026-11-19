@@ -56,6 +56,18 @@ openssl rand -base64 32
 AUTH_SECRET="paste-the-generated-value-here"
 ```
 
+### Local Stripe webhook testing
+
+Start the app, then forward Stripe events to the local webhook:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+Copy the printed `whsec_...` signing secret into `STRIPE_WEBHOOK_SECRET` in
+`.env.local`. Set `CRON_SECRET` to a separate random value for the appointment
+cleanup route.
+
 ## Conventions
 
 - Appointment times are stored in **UTC** and displayed in `CLINIC_TIMEZONE`

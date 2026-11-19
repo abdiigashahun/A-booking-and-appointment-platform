@@ -70,7 +70,7 @@ export function BookingForm({ services, doctors }: { services: Service[]; doctor
       else { setError(result.message); update({ slot: undefined, step: "3" }); }
       return;
     }
-    router.push(`/dashboard?booked=${result.appointmentId}`);
+    window.location.assign(result.checkoutUrl);
   };
 
   return <div className="mx-auto max-w-5xl">

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { getAvailableSlots } from "@/lib/slots";
+import { getStripe } from "@/lib/stripe";
 
 const appointmentSchema = z.object({
   serviceId: z.string().min(1).max(200),
@@ -14,7 +15,7 @@ const appointmentSchema = z.object({
 });
 
 export type AppointmentResult =
-  | { success: true; appointmentId: string }
+  | { success: true; appointmentId: string; checkoutUrl: string }
   | { success: false; code: "UNAUTHENTICATED" | "SLOT_TAKEN" | "INVALID"; message: string };
 
 export async function createAppointment(input: unknown): Promise<AppointmentResult> {
@@ -56,7 +57,31 @@ export async function createAppointment(input: unknown): Promise<AppointmentResu
         notes: parsed.data.notes?.trim() || null,
       },
     });
-    return { success: true, appointmentId: appointment.id };
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const cancelParams = new URLSearchParams({
+      service: service.id,
+      doctor: doctorId,
+      date: start.toISOString().slice(0, 10),
+      slot: start.toISOString(),
+      step: "4",
+    });
+    const checkoutSession = await getStripe().checkout.sessions.create({
+      mode: "payment",
+      line_items: [{
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: service.depositCents,
+          product_data: { name: `${service.name} deposit` },
+        },
+      }],
+      metadata: { appointmentId: appointment.id },
+      success_url: `${appUrl}/book/success`,
+      cancel_url: `${appUrl}/book?${cancelParams.toString()}`,
+    });
+    if (!checkoutSession.url) throw new Error("Stripe did not return a checkout URL.");
+    await db.appointment.update({ where: { id: appointment.id }, data: { stripeSessionId: checkoutSession.id } });
+    return { success: true, appointmentId: appointment.id, checkoutUrl: checkoutSession.url };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return { success: false, code: "SLOT_TAKEN", message: "That slot was just taken. Please choose another time." };
