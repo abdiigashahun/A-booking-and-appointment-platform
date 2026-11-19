@@ -46,6 +46,16 @@ Open [http://localhost:3000](http://localhost:3000).
 All configuration lives in `.env.local` (gitignored). See `.env.example` for the
 full list with placeholder values — never commit real secrets.
 
+Generate the Auth.js secret locally and add it to `.env.local`:
+
+```bash
+openssl rand -base64 32
+```
+
+```env
+AUTH_SECRET="paste-the-generated-value-here"
+```
+
 ## Conventions
 
 - Appointment times are stored in **UTC** and displayed in `CLINIC_TIMEZONE`

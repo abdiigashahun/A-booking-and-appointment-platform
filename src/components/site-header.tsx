@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Menu, Stethoscope, X } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/user-menu";
 
 const links = [
   { label: "Services", href: "#services" },
@@ -29,10 +29,7 @@ export function SiteHeader() {
           {links.map((link) => <Link key={link.href} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{link.label}</Link>)}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" asChild><Link href="/login">Log in</Link></Button>
-          <Button asChild><Link href="/signup">Create account</Link></Button>
-        </div>
+        <UserMenu className="flex md:hidden" />
 
         <button type="button" className="rounded-lg p-2 text-muted-foreground hover:bg-muted md:hidden" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -43,8 +40,7 @@ export function SiteHeader() {
           <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
             {links.map((link) => <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">{link.label}</Link>)}
             <div className="mt-3 grid grid-cols-2 gap-3 border-t pt-4">
-              <Button variant="outline" asChild><Link href="/login">Log in</Link></Button>
-              <Button asChild><Link href="/signup">Sign up</Link></Button>
+              <UserMenu />
             </div>
           </nav>
         </div>
