@@ -40,9 +40,10 @@ model User {
 }
 
 model Specialty {
-  id      String   @id @default(cuid())
-  name    String   @unique
-  doctors Doctor[]
+  id       String   @id @default(cuid())
+  name     String   @unique
+  isActive Boolean  @default(true)
+  doctors  Doctor[]
 }
 
 model Doctor {
