@@ -3,6 +3,7 @@ import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const adminPassword = "CareSlotAdmin!2026#Secure";
+const patientPassword = "CareSlotPatient!2026";
 
 async function main() {
   const specialties = await Promise.all(
@@ -69,9 +70,17 @@ async function main() {
     create: { name: "CareSlot Admin", email: "admin@careslot.test", role: Role.ADMIN, passwordHash: await bcrypt.hash(adminPassword, 12) },
   });
 
+  await prisma.user.upsert({
+    where: { email: "patient@careslot.test" },
+    update: { name: "CareSlot Patient", role: Role.PATIENT, passwordHash: await bcrypt.hash(patientPassword, 12) },
+    create: { name: "CareSlot Patient", email: "patient@careslot.test", role: Role.PATIENT, passwordHash: await bcrypt.hash(patientPassword, 12) },
+  });
+
   console.log("Seed complete.");
   console.log("Admin email: admin@careslot.test");
   console.log(`Admin password (store securely): ${adminPassword}`);
+  console.log("Patient email: patient@careslot.test");
+  console.log(`Patient password (store securely): ${patientPassword}`);
 }
 
 main()
